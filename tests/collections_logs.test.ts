@@ -1,5 +1,5 @@
 import {expect , test} from '@playwright/test'
-import { apiRequestSaleParticulars } from '../generic/apiRequest';
+import { apiRequestReceiptLogs, apiRequestSaleParticulars, createFolder } from '../generic/apiRequest';
 import { EXCELS } from '../constants';
 import { EXCELJS } from '../constants';
 import { HEADERS } from '../constants';
@@ -8,101 +8,90 @@ import { PATH } from '../constants';
 let flatDetails : any = {};
 const promises :any =[] ;
 let count = 1;
-let count1 = 1;
+let count1 = 1, flag = 1;
 
 test ("ReceiptLogs Details" , async () => {
     const ExcelJS = require(EXCELJS);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(EXCELS.SPECTRASCRRECEIPTLOGS);
-    const worksheet = workbook.getWorksheet('collection-logs');
+    await workbook.xlsx.readFile(EXCELS.SPECTRA_SCR_RECEIPTLOGS);
+    const worksheet = workbook.getWorksheet('receipt-logs');
+
     const workbook1 = new ExcelJS.Workbook();
-    const sheet = workbook1.addWorksheet(EXCELS.SALEPARTICULARS);
-
-    const workbook2 = new ExcelJS.Workbook();
-    const sheet1 = workbook2.addWorksheet(EXCELS.MISSINGFLATS);
-
-    sheet.columns = [
-        { header: HEADERS.SNO, key: 'sNo' },
-        { header: HEADERS.FLATNO, key: 'flatNo' },
-    ];
+    const sheet = workbook1.addWorksheet(EXCELS.MISMATCH_RECEIPTS);
     
+    const workbook2 = new ExcelJS.Workbook();
+    const sheet1 = workbook2.addWorksheet(EXCELS.MISSING_RECEIPTS);
+    
+    sheet.columns = [
+        { headers : HEADERS.SNO , key : 'sNo'},
+        { headers : HEADERS.RECEIPTNUMBER , key : 'receiptNo'},
+        { headers : HEADERS.FLATNO , key : 'flatNo'},
+        { header: HEADERS.RECEIPTAMOUNT, key: 'amount' },
+    ]
     sheet1.columns = [
         { header: HEADERS.SNO, key: 'sNo' },
         { header: HEADERS.FLATNO, key: 'flatNo' },
-        { header: HEADERS.TOTALAMOUNTFROMEXCEL, key: 'toatlAmountExcel' },
-        { header: HEADERS.TOTALAMOUNTFROMSYSTEM, key: 'toatlAmountSystem' },
-        { header: HEADERS.ACCUREDAMOUNTFROMEXCEL, key: 'accuredAmountExcel'},
-        { header: HEADERS.ACCUREDAMOUNTFROMSYSTEM, key: 'accuredAmountSystem' },
-        { header: HEADERS.COLLECTEDAMOUNTFROMEXCEL, key: 'collectedAmountExcel' },
-        { header: HEADERS.COLLECTEDAMOUNTFROMSYSTEM, key: 'collectedAmountSystem' },
-        { header: HEADERS.RECEIVABLEAMOUNTFROMEXCEL, key: 'receivableAmountExcel' },
-        { header: HEADERS.RECEIVABLEAMOUNTFROMSYSTEM, key: 'receivableAmountSystem' }
+        { header: HEADERS.RECEIPTNUMBER, key: 'receiptNo' },
+        { header: HEADERS.RECEIPTAMOUNT, key: 'amount' },
+        { header: HEADERS.RECEIPTREFERENCENO, key: 'refNumber'},
+        { header: HEADERS.RECEIPTSOURCE, key: 'source' },
+        { header: HEADERS.RECEIPTTYPE, key: 'type' },
     ];
 
     const rowcount = worksheet.rowCount;    
-    //console.log(rowcount)
-    for(let i=2;i<rowcount;i++)
+    for(let i=2;i<10;i++)
     {
         const row = worksheet.getRow(i) ;
         flatDetails = {
             sNo : row.getCell(1).value,
-            flatNumber : row.getCell(2).value ,
-            totalAmount :row.getCell(3).value ,
-            accruedAmount : row.getCell(4).value ,
-            collectedAmount : row.getCell(5).value ,
-            receivableAmount : row.getCell(6).value
+            date : row.getCell(2).value ,
+            receiptNo :row.getCell(3).value ,
+            flatNumber : row.getCell(4).value ,
+            customerName : row.getCell(5).value ,
+            milestones : row.getCell(6).value,
+            source : row.getCell(7).value,
+            type : row.getCell(8).value,
+            refNo : row.getCell(9).value,
+            amount : row.getCell(10).value
         }
-        let totalAmtExl= null,accuredAmtExl= null , collectedAmtExl =null , recAmtExl= null , totalAmtSys=null ,accuredAmtSys =null  , collectedASys =null , recAmtSys =null;
-        const response = await apiRequestSaleParticulars(flatDetails.flatNumber);
+        let receiptAmtExl= null , receiptAmtSys=null;
+        const response = await apiRequestReceiptLogs(flatDetails.receiptNo);
 
         if(response.length == 0){
             sheet.addRow({
                 sNo: count++,
+                receiptno : flatDetails.receiptNo,
                 flatNo: flatDetails.flatNumber,
+                amount: flatDetails.amount
             });
         }
         else{
-            if(flatDetails.totalAmount != response[0][RESPONSE.TOTALAMOUNT] )
+            if(flatDetails.amount != response[0][RESPONSE.RECEIPT_AMOUNT] )
             {
-                totalAmtExl =  flatDetails.totalAmount ;
-                totalAmtSys =  response[0][RESPONSE.TOTALAMOUNT] ;
-            }
-            if(flatDetails.accruedAmount != response[0][RESPONSE.ACCRUEDAMOUNT])
-            {
-                accuredAmtExl = flatDetails.accruedAmount
-                accuredAmtSys = response[0][RESPONSE.ACCRUEDAMOUNT]
-            }
-            if(flatDetails.collectedAmount != response[0][RESPONSE.COLLECTEDAMOUNT])
-            {
-                collectedAmtExl = flatDetails.collectedAmount
-                collectedASys = response[0][RESPONSE.COLLECTEDAMOUNT]
-            }
-            if(flatDetails.receivableAmount != response[0][RESPONSE.RECEIVABLEAMOUNT])
-            {
-                recAmtExl = flatDetails.receivableAmount
-                recAmtSys = response[0][RESPONSE.RECEIVABLEAMOUNT]
+                receiptAmtExl =  flatDetails.amount ;
+                receiptAmtSys =  response[0][RESPONSE.RECEIPT_AMOUNT];
+                flag = 0;
             }
       }
+      if(flag == 0)
+      {
         sheet1.addRow({
                 sNo: count1++,
                 flatNo: flatDetails.flatNumber,
-                toatlAmountExcel: totalAmtExl,
-                toatlAmountSystem :totalAmtSys ,
-                accuredAmountExcel : accuredAmtExl,
-                accuredAmountSystem :accuredAmtSys ,
-                collectedAmountExcel : collectedAmtExl,
-                collectedAmountSystem : collectedASys ,
-                receivableAmountExcel: recAmtExl,
-                receivableAmountSystem: recAmtSys,
-
+                receiptNo: flatDetails.receiptNo,
+                amount : flatDetails.amount ,
+                refNumber : flatDetails.refNo,
+                source : flatDetails.source ,
+                type : flatDetails.type,
             });
+        }
              console.log(i)
-            // console.log(response)
     }
-
+    await createFolder();
     const path = require(PATH);
-    const filePath1 = path.join(__dirname, EXCELS.SPECTRAMISSINGFLATS);
-    const filePath2 = path.join(__dirname, EXCELS.SPECTRAFLATSALEPARTUCULARSMISMATCH);
+    const filePath1 = path.join(__dirname, EXCELS.SPECTRA_MISSING_RECEIPTS);
+    const filePath2 = path.join(__dirname, EXCELS.SPECTRA_MISMATCH_RECEIPTS);
     await workbook1.xlsx.writeFile(filePath1);
-    await workbook2.xlsx.writeFile(filePath2)
+    await workbook2.xlsx.writeFile(filePath2);
+      
 }); 
