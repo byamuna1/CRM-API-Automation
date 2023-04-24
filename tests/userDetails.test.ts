@@ -10,10 +10,10 @@ let applicant_1:  any ={};
 let applicant_2 : any = {};
 let j ;
 
-test ("FlatUser deatils" , async () => {
+test ("UserMissingFlats Details" , async () => {
      const ExcelJS = require(EXCELJS);
      const workbook = new ExcelJS.Workbook();
-     const sheet = workbook.addWorksheet(EXCELS.FLATUSERSDETAILS);
+     const sheet = workbook.addWorksheet(EXCELS.FLAT_USERS_DETAILS);
      sheet.columns = [
          { header: HEADERS.SNO, key: 'sNo' },
          { header: HEADERS.FLATNO, key: 'flatNo' },
@@ -74,7 +74,7 @@ test ("FlatUser deatils" , async () => {
       }
 
      const path = require(PATH);
-     const filePath = path.join(__dirname, EXCELS.SPECTRAMISSINGDATA);
+     const filePath = path.join(__dirname, EXCELS.SPECTRA_MISSING_DATA);
      await workbook.xlsx.writeFile(filePath);
       console.log('Ended Validation')
 
