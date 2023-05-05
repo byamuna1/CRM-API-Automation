@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MAIN, SPRINGS } from '../meta';
+import { SPRINGS } from '../meta';
 
 const headers = {
     'Accept': 'application/json',

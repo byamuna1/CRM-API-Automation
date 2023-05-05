@@ -1,5 +1,5 @@
 import {expect , test} from '@playwright/test'
-import { apiRequestFlatDetails } from '../generic/apiRequest';
+import { apiRequestFlatDetails, createFolder } from '../generic/apiRequest';
 import { apiRequestCollectionLogDetails } from '../generic/apiRequest';
 import { HEADERS } from '../constants';
 import { RESPONSE } from '../constants';
@@ -10,7 +10,7 @@ let applicant_1:  any ={};
 let applicant_2 : any = {};
 let j ;
 
-test ("UserMissingFlats Details" , async () => {
+test ("UserMissingData Details" , async () => {
      const ExcelJS = require(EXCELJS);
      const workbook = new ExcelJS.Workbook();
      const sheet = workbook.addWorksheet(EXCELS.FLAT_USERS_DETAILS);
@@ -56,7 +56,7 @@ test ("UserMissingFlats Details" , async () => {
              }
          }
          
-         if((applicant_1.applicant1 == RESPONSE.NA || !applicant_1.applicant1 ||  !applicant_1.ContactNo1  ||  !applicant_1.Email1)  || (len == 2 && (applicant_2.applicant2 == RESPONSE.NA || !applicant_2.applicant2 || !applicant_2.ContactNo2 || !applicant_2.Email2))){
+         if((applicant_1.applicant1 == RESPONSE.NA || !applicant_1.applicant1 ||  !applicant_1.ContactNo1 )  ){
           sheet.addRow({
                sNo: count++,
                flatNo: flatNumber,
@@ -68,14 +68,14 @@ test ("UserMissingFlats Details" , async () => {
                email2: applicant_2.Email2,
            });
          }
-             //excel_upload(count++ , flatNumber,applicant_1, applicant_2)
+
              applicant_1 ={}
              applicant_2 = {}
       }
-
-     const path = require(PATH);
-     const filePath = path.join(__dirname, EXCELS.SPECTRA_MISSING_DATA);
-     await workbook.xlsx.writeFile(filePath);
-      console.log('Ended Validation')
+      await createFolder();
+    const path = require(PATH);
+    const filePath = path.join(__dirname, EXCELS.USERDETAILS_EXCEL);
+    await workbook.xlsx.writeFile(filePath);
+    console.log('Ended Validation')
 
 }); 
