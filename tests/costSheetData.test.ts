@@ -1,9 +1,6 @@
 import {expect , test} from '@playwright/test'
 import { apiRequestFlatCostSheetDetails, apiRequestFlatDetails,  createFolder } from '../generic/apiRequest';
-import { EXCELS, RESPONSE } from '../constants';
-import { EXCELJS } from '../constants';
-import { HEADERS } from '../constants';
-import { PATH } from '../constants';
+import { EXCELS, RESPONSE, EXCELJS, HEADERS, PATH } from '../constants';
 import { MAIN } from '../meta';
 let costSheetDetailsForomScr : any = {};
 let missingCount = 1 , mismatchCount = 1, costflag =1;
@@ -121,7 +118,6 @@ test ("costsheet Data" , async () => {
 
         if(costSheetDetailsForomScr.statusOfFLat == 'Booked' || costSheetDetailsForomScr.statusOfFLat == 'booked')
         {
-        console.log(costSheetDetailsForomScr)
             let costsheet = {
                 'basicRate' : costSheetDetailsForomScr.basicRate , 
                 'basicCost' : costSheetDetailsForomScr.basicCost , 
@@ -259,7 +255,6 @@ test ("costsheet Data" , async () => {
                 if(costflag == 0)
                 {
                     if(result.data['flatNumber'] == '706' )
-                    console.log(scr_sheet , result.data.saleParticulars.otherParticulars[0]['costs'])
 
                     mismatchData.addRow({
                         sNo : mismatchCount++,

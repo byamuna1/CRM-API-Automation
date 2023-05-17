@@ -52,9 +52,7 @@ test ("ReceiptLogs Details" , async () => {
     ];
 
     const rowcount = worksheet.rowCount;  
-    console.log(rowcount)  
     const response = await apiRequestReceiptLogs('');
-    console.log(response.length)
     for(let i =0; i< response.length;i++)
     {
         if(response[i]['receiptNumber'] == null || response[i]['referenceNumber'] == 'LUMPSUM' || response[i]['amountType'] == 'CANCELLED')
@@ -72,11 +70,10 @@ test ("ReceiptLogs Details" , async () => {
         else
         {
             receipts_system.set(String(parseInt(response[i]['receiptNumber'])),{'flatNumber': response[i]['flatNumber'], 'amount' : response[i]['amount'] , 'referenceNumber' : response[i]['referenceNumber']})
-            //console.log(parseInt(response[i]['receiptNumber']))
+           
         }
         
     }
-    console.log(receipts_system.size ,"system")
 
     for(let i = 6;i<5000;i++)
     {
@@ -100,7 +97,7 @@ test ("ReceiptLogs Details" , async () => {
         }
         receiptDetails ={}
     }
-    console.log(receipt_scr.size ,"scr ")
+    
     let receiptfromSystem, receiptfromSCR ;
     for (const [key, value] of receipt_scr.entries()) {
         if(receipts_system.has(key))
@@ -140,8 +137,8 @@ test ("ReceiptLogs Details" , async () => {
      }
 
     await createFolder();
-    const path = require(PATH);
-    const filePath1 = path.join(__dirname, EXCELS.SPECTRA_MISSING_RECEIPTS);
-    await workbook1.xlsx.writeFile(filePath1);
+    // const path = require(PATH);
+    // const filePath1 = path.join(__dirname, EXCELS.SPECTRA_MISSING_RECEIPTS);
+    // await workbook1.xlsx.writeFile(filePath1);
       
 }); 

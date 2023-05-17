@@ -1,10 +1,7 @@
 import {expect , test} from '@playwright/test'
 import { apiRequestFlatCostSheetDetails, apiRequestFlatDetails,  createFolder } from '../generic/apiRequest_springs';
-import { EXCELS, RESPONSE } from '../constants';
-import { EXCELJS } from '../constants';
-import { HEADERS } from '../constants';
-import { PATH } from '../constants';
-import { MAIN, SPRINGS } from '../meta';
+import { EXCELS, RESPONSE, SHEETS , EXCELJS, HEADERS, PATH } from '../constants';
+import { SPRINGS } from '../meta';
 let costSheetDetailsForomScr : any = {};
 let missingCount = 1 , mismatchCount = 1, costflag =1;
 let scrCostSheet = new Map<any,any>()
@@ -13,12 +10,12 @@ test ("springs costsheet Data" , async () => {
     const ExcelJS = require(EXCELJS);
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(SPRINGS.SCR_EXCEL);
-    const worksheet = workbook.getWorksheet('Master Data');
+    const worksheet = workbook.getWorksheet(SHEETS.MASTER_DATA);
 
     const workbook1 = new ExcelJS.Workbook();
-    const mismatchData = workbook1.addWorksheet('mismatch costsheets');
-    const noflats = workbook1.addWorksheet('inSystemNotInSCRFlats');
-    const missingData = workbook1.addWorksheet('missing costsheets');
+    const mismatchData = workbook1.addWorksheet(EXCELS.MISMATCH_COSTSHEET);
+    const noflats = workbook1.addWorksheet(EXCELS.INSYSTEM_NOTINSCR);
+    const missingData = workbook1.addWorksheet(EXCELS.MISSING_COSTSHEET);
     
     mismatchData.columns = [
         { header : HEADERS.SNO , key : 'sNo'},
@@ -34,7 +31,7 @@ test ("springs costsheet Data" , async () => {
         { header : HEADERS.INFRASTRUCTURE, key : 'infrastructure'},
         { header : HEADERS.INFRASTRUCTURE_SYSTEM, key : 'infrastructureFromSystem'},
         { header : HEADERS.F_A, key : 'f_a'},
-        { header : HEADERS.F_A, key : 'f_a_System'},
+        { header : HEADERS.F_A_SYSTEM, key : 'f_a_System'},
         { header : HEADERS.CAR_PArking, key : 'carParking'},
         { header : HEADERS.CAR_PArking_SYSTEM, key : 'carParkingSystem'},
         { header : HEADERS.DOCUMENTATION, key : 'documentation'},
@@ -77,7 +74,7 @@ test ("springs costsheet Data" , async () => {
                 grossAmount : row.getCell(46).value?.result??0
         }
 
-        if(costSheetDetailsForomScr.statusOfFLat == 'Booked' || costSheetDetailsForomScr.statusOfFLat == 'booked')
+        if(costSheetDetailsForomScr.statusOfFLat == RESPONSE.BOOKED || costSheetDetailsForomScr.statusOfFLat == RESPONSE.booked)
         {
             let costsheet = {
                 'basicRate' : costSheetDetailsForomScr.basicRate , 
@@ -103,8 +100,31 @@ test ("springs costsheet Data" , async () => {
 
     for(let index=0; index<res.data.length ; index++)
     {
-        let basicRate = null ,basicRateSystem = null , basicCost = null, basicCostSystem = null, floorRise = null, floorRiseSystem = null, cornerPremium = null ,cornerPremiumSystem= null , infrastructure = null , infrastructureSystem;
-        let f_a = null, f_a_System = null , carParking = null, carParkingSystem = null,documentation = null, documentationSystem = null, total = null, totalSystem :string = '' , gst = null, gstSystem = '', grossAmount = null, grossAmount_system = '';
+        let costsheet_types : any = {
+            basicRate : null ,
+            basicRateSystem : null , 
+            basicCost : null, 
+            basicCostSystem : null, 
+            floorRise : null, 
+            floorRiseSystem : null, 
+            cornerPremium : null ,
+            cornerPremiumSystem : null , 
+            infrastructure : null , 
+            infrastructureSystem : null,
+            f_a : null, 
+            f_a_System : null , 
+            carParking : null, 
+            carParkingSystem : null,
+            documentation : null, 
+            documentationSystem : null, 
+            total : null, 
+            totalSystem : '' , 
+            gst : null, 
+            gstSystem : '', 
+            grossAmount : null, 
+            grossAmount_system : ''
+        }
+
         let totalsaleParticulars :number = 0;
         let flatID : string = res.data[index][RESPONSE.ID] ;
         const result = await apiRequestFlatCostSheetDetails(flatID);
@@ -119,129 +139,129 @@ test ("springs costsheet Data" , async () => {
         }
         else
         {
-            if(scrCostSheet.has(String(result.data['flatNumber']))) 
+            if(scrCostSheet.has(String(result.data[RESPONSE.FLATNUMBER]))) 
             {
-                let scr_sheet = scrCostSheet.get(String(result.data['flatNumber'])) ;
+                let scr_sheet = scrCostSheet.get(String(result.data[RESPONSE.FLATNUMBER])) ;
 
-                for(let c=0 ; c<result.data.saleParticulars.otherParticulars[0]['costs'].length ;  c++)
+                for(let c=0 ; c<result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS].length ;  c++)
                 {
-                    if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Basic Price'  )
+                    if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Basic Price'  )
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total']- scr_sheet.basicCost) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL]- scr_sheet.basicCost) > 4)
                         {
                            
                             costflag = 0 ;
-                            basicCostSystem = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            basicCost = scr_sheet.basicCost;
+                            costsheet_types.basicCostSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.basicCost = scr_sheet.basicCost;
                         }
                     }
-                    else if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Floor Rise' || result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Floor Rise Charges' )
+                    else if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Floor Rise' || result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Floor Rise Charges' )
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] - scr_sheet.floorRise) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.floorRise) > 4)
                         {
                             costflag = 0 ;
-                            floorRiseSystem = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            floorRise = scr_sheet.floorRise ;
+                            costsheet_types.floorRiseSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.floorRise = scr_sheet.floorRise ;
                         }
                     }
-                    else if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Corner Premium'  || result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Corner Flat Premium')
+                    else if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Corner Premium'  || result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Corner Flat Premium' || result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Corner Premium Charges')
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] - scr_sheet.cornerPremium) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.cornerPremium) > 4)
                         {
                             costflag = 0 ;
-                            cornerPremiumSystem = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            cornerPremium = scr_sheet.cornerPremium ;
+                            costsheet_types.cornerPremiumSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.cornerPremium = scr_sheet.cornerPremium ;
                         }
                     }
-                    else if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Infrastructure Charges' )
+                    else if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Infrastructure Charges' )
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] - scr_sheet.infrastructure) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.infrastructure) > 4)
                         {
                             costflag = 0 ;
-                            infrastructureSystem = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            infrastructure = scr_sheet.infrastructure ;
+                            costsheet_types.infrastructureSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.infrastructure = scr_sheet.infrastructure ;
                         }
                     }
-                    else if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Facilities and Amenities' ||  result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Club Facilities & Amenities Charges')
+                    else if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Facilities and Amenities' ||  result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Club Facilities & Amenities Charges')
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] - scr_sheet.F_A) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.F_A) > 4)
                         {
                             costflag = 0 ;
-                            f_a_System = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            f_a = scr_sheet.F_A_SYSTEM ;
+                            costsheet_types.f_a_System = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.f_a = scr_sheet.F_A_SYSTEM ;
                         }
                     }
-                    else if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Car Parking (back to back)' || result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Car Parking (Individual)' || result.data.saleParticulars.otherParticulars[0]['costs'][c]['name']== '1 Car and 1 Bike Parking Charges')
+                    else if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Car Parking (back to back)' || result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Car Parking (Individual)' || result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME]== '1 Car and 1 Bike Parking Charges')
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] - scr_sheet.carParking) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.carParking) > 4)
                         {
                             costflag = 0 ;
-                            carParkingSystem = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            carParking = scr_sheet.carParking ; 
+                            costsheet_types.carParkingSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.carParking = scr_sheet.carParking ; 
                         }
                     }
-                    else if(result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Documentation' || result.data.saleParticulars.otherParticulars[0]['costs'][c]['name'] == 'Documentation Charges' )
+                    else if(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Documentation' || result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.NAME] == 'Documentation Charges' )
                     {
-                        if(Math.abs(result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] - scr_sheet.documentation) > 4)
+                        if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.documentation) > 4)
                         {
                             costflag = 0 ;
-                            documentationSystem = result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'];
-                            documentation = scr_sheet.documentation ;
+                            costsheet_types.documentationSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
+                            costsheet_types.documentation = scr_sheet.documentation ;
                         }
                     }
-                    totalsaleParticulars = totalsaleParticulars + result.data.saleParticulars.otherParticulars[0]['costs'][c]['total'] ;
+                    totalsaleParticulars = totalsaleParticulars + result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] ;
                     
                 }
 
                 if(Math.abs(scr_sheet.total - totalsaleParticulars ) > 4)
                 {
                     costflag = 0 ;
-                    totalSystem = String(totalsaleParticulars)  ;
-                    total = scr_sheet.total
+                    costsheet_types.totalSystem = String(totalsaleParticulars)  ;
+                    costsheet_types.total = scr_sheet.total
                 }
 
                 if(Math.abs(scr_sheet.gst - (totalsaleParticulars * 0.05) ) > 4)
                 {
                     costflag = 0 ;
-                    gstSystem = String(totalsaleParticulars * 0.05 ) ;
-                    gst = scr_sheet.gst
+                    costsheet_types.gstSystem = String(totalsaleParticulars * 0.05 ) ;
+                    costsheet_types.gst = scr_sheet.gst
                 }
                  
                
                 if(Math.abs(scr_sheet.grosstotal - ((totalsaleParticulars * 0.05) + totalsaleParticulars) ) > 4)
                 {
                     costflag = 0 ;
-                    grossAmount_system = String((totalsaleParticulars * 0.05) + totalsaleParticulars);
-                    grossAmount = scr_sheet.grosstotal
+                    costsheet_types.grossAmount_system = String((totalsaleParticulars * 0.05) + totalsaleParticulars);
+                    costsheet_types.grossAmount = scr_sheet.grosstotal
                 }
 
                 if(costflag == 0)
                 {
                     mismatchData.addRow({
                         sNo : mismatchCount++,
-                        flatNo : result.data['flatNumber'],
-                        basicRate : basicRate,
-                        basicRateSystem : basicRateSystem,
-                        basicCost : basicCost ,
-                        basicCostSystem : basicCostSystem,
-                        floorRise : floorRise,
-                        floorRiseSystem : floorRiseSystem,
-                        cornerPremium : cornerPremium,
-                        cornerPremiumSystem : cornerPremiumSystem,
-                        infrastructure : infrastructure,
-                        infrastructureFromSystem  : infrastructureSystem,
-                        f_a : f_a ,
-                        f_a_System : f_a_System ,
-                        carParking : carParking ,
-                        carParkingSystem : carParkingSystem ,
-                        documentation : documentation, 
-                        documentationSystem : documentationSystem ,
-                        total : total,
-                        totalSystem :totalSystem ?? '',
-                        gst : gst ,
-                        gstSystem : gstSystem,
-                        grossAmount : grossAmount,
-                        grossAmount_system : grossAmount_system
+                        flatNo : result.data[RESPONSE.FLATNUMBER],
+                        basicRate : costsheet_types.basicRate,
+                        basicRateSystem : costsheet_types.basicRateSystem,
+                        basicCost : costsheet_types.basicCost ,
+                        basicCostSystem : costsheet_types.basicCostSystem,
+                        floorRise : costsheet_types.floorRise,
+                        floorRiseSystem : costsheet_types.floorRiseSystem,
+                        cornerPremium : costsheet_types.cornerPremium,
+                        cornerPremiumSystem : costsheet_types.cornerPremiumSystem,
+                        infrastructure : costsheet_types.infrastructure,
+                        infrastructureFromSystem  : costsheet_types.infrastructureSystem,
+                        f_a : costsheet_types.f_a ,
+                        f_a_System : costsheet_types.f_a_System ,
+                        carParking : costsheet_types.carParking ,
+                        carParkingSystem : costsheet_types.carParkingSystem ,
+                        documentation : costsheet_types.documentation, 
+                        documentationSystem : costsheet_types.documentationSystem ,
+                        total : costsheet_types.total,
+                        totalSystem :costsheet_types.totalSystem ?? '',
+                        gst : costsheet_types.gst ,
+                        gstSystem : costsheet_types.gstSystem,
+                        grossAmount : costsheet_types.grossAmount,
+                        grossAmount_system : costsheet_types.grossAmount_system
 
                     });
                 }
