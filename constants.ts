@@ -7,14 +7,15 @@ const newdate = year + "-" + month + "-" + day;
 export const HEADERS = {
     PAYMENTTYPE : 'PAYMENT TYPE',
     SNO : 'SNO' ,
-    FLATNO : 'FLatNO' ,
+    DATE : 'date',
+    FLATNO : 'FLat NO' ,
     FLATNO_SYSTEM : 'FlatNo System',
     APPLICANT1 : 'APPLICANT1',
-    CONTACTNUMBER1 : 'CONTACTNUMBER1',
-    EMAIL1 : 'EMAIL1',
+    CONTACTNUMBER1 : 'Phone Number 1',
+    EMAIL1 : 'Email ID 1',
     APPLICANT2 : 'APPLICANT2',
-    CONTACTNUMBER2 : 'CONTACTNUMBER2' ,
-    EMAIL2 : 'EMAIL2',
+    CONTACTNUMBER2 : 'Phone Number 2' ,
+    EMAIL2 : 'Email ID 1',
     BASIC_RATE : 'Basic Rate',
     BASIC_COST : 'Basic Cost',
     FLOOR_RISE : 'Floor Rise',
@@ -47,17 +48,22 @@ export const HEADERS = {
     RECEIVABLEAMOUNTFROMEXCEL : 'ReceivableAmountFromExcel',
     RECEIVABLEAMOUNTFROMSYSTEM : 'ReceivableAmountFromSystem',
 
-    RECEIPTNUMBER : 'RECEIPTNO',
-    RECEIPTNUMBER_SYSTEM : 'RECEIPT NO SYSTEM',
-    RECEIPTAMOUNT : 'AMOUNT',
-    RECEIPTAMOUNT_SYSTEM : 'RECEIPT AMOUNT SYSTEM',
-    RECEIPTREFERENCENO : 'REFERENCENO',
-    REFERENCE_NUM_SYSTEM : 'REFERENCE NO SYSTEM',
+    RECEIPTNUMBER : 'RECEIPTNO_SCR',
+    RECEIPTNUMBER_SYSTEM : 'RECEIPTNO_SYSTEM',
+    RECEIPTAMOUNT : 'AMOUNT_SCR',
+    RECEIPTAMOUNT_SYSTEM : 'RECEIPTAMOUNT_SYSTEM',
+    RECEIPTREFERENCENO : 'REFERENCENO_SCR',
+    REFERENCE_NUM_SYSTEM : 'REFERENCENO_SYSTEM',
     RECEIPTSOURCE : 'SOURCE',
     RECEIPTTYPE : 'TYPE'
 }
 
 export const RESPONSE = {
+    COSTS : 'costs',
+    NAME : 'name',
+    TOTAL : 'total',
+    BOOKED : 'Booked',
+    booked : 'bokked',
     FLATNUMBER : 'flatNumber',
     APPLICANTS : 'applicants',
     FIRSTNAME : 'firstName' ,
@@ -71,40 +77,50 @@ export const RESPONSE = {
     COLLECTEDAMOUNT : 'collectedAmount',
     RECEIVABLEAMOUNT : 'receivableAmount',
     RECEIPT_AMOUNT : 'amount',
+    RECEIPTNUMBER : 'receiptNumber',
+    REFERENCE_NUMBER : 'referenceNumber',
+    AMOUNTTYPE : 'amountType',
+    ISSUSPENSE : 'isSuspense',
+    AMOUNT: 'amount',
 }
 
 export const PATH = 'path'
 export const EXCELJS = 'exceljs'
 
+export const SHEETS = {
+   MASTER_DATA : 'Master Data',
+   RECEIVABLELOGS_DATA : 'Rec. St',
+   RECEIPTLOGS_DATA : 'Coll Log'
+}
+
 export const EXCELS = {
-    SCR_SPECTRA_FLAT_SALEPARTICULARS : 'SPECTRA - Receivable Logs as on 14_4_2023.xlsx',
-    SPRINGS_SCR_EXCEL : `SCR - ASBL Springs as on 25-04-2023.xlsx`,
-    USERDETAILS_EXCEL : `excelDownloads/${newdate}/springs-userdetails.xlsx`,
-    SCREXCELSHEET:'',
+    USERDETAILS_EXCEL : `excelDownloads/${newdate}/spectra-userdetails.xlsx`,
+    
     FLAT_USERS_DETAILS : 'user-details.xlsx' ,
-    MISSING_FLATS : 'missing-flats.xlsx',
-    SALE_PARTICULARS : 'Flat-sale-particulars.xlsx',
+    MISMATCH_FLATS : 'mismatch-saleparticulars.xlsx',
+    MISSING_FLATS : 'missing-flats-inSystem.xlsx',
     MISSING_RECEIPTS : 'missing-receipts' ,
     MISMATCH_RECEIPTS : 'mismatch-receipts',
-    SPECTRA_MISSING_DATA : 'excelDownloads/spectra-Missing-Data.xlsx',
-    SPIRE_MISSING_DATA : 'excelDownloads/spire-Missing-Data.xlsx',
-    SPRINGS_MISSING_DATA : 'excelDownloads/springs-Missing-Data.xlsx',
-
-    SPIRE_MISSING_FLATS : 'excelDownloads/spire-flats-Missing-Data.xlsx',
-    SPRINGS_MISSING_FLATS : 'excelDownloads/springs-flats-Missing-Data.xlsx',
-    SPECTRA_MISSING_FLATS : 'excelDownloads/spectra-flats-Missing-Data.xlsx',
+    MISMATCH_COSTSHEET : 'mismatch costsheets',
+    INSYSTEM_NOTINSCR : 'inSystemNotInSCRFlats',
+    MISSING_COSTSHEET : 'missing costsheets',
+    SUSPENSE_LUMPSUM_NORECEIPTNO : 'suspense-cancelled-noreceiptno',
 
     SPIREFLATSALEPARTUCULARSMISMATCH : `excelDownloads/spire-flatSaleParticulars-Mismatching-Data.xlsx`,
     SPRINGSFLATSALEPARTUCULARSMISMATCH : 'excelDownloads/springs-flatSaleParticulars-Mismatching-Data.xlsx',
     SPECTRAFLATSALEPARTUCULARSMISMATCH : 'excelDownloads/spectra-flatSaleParticulars-Mismatching-Data.xlsx',
 
     SPECTRAUSERSMISSINGDETAILS : 'excelsDownloads/spectraUsersMissingData.xlsx',
-    SPECTRA_SCR_RECEIPTLOGS : 'SCR - ASBL Spectra as on 21-04-2023.xlsx',
-    SPRINGS_MISSING_RECEIPTS :  `excelDownloads/${newdate}/springs-mising-receipts.xlsx`,
-    SPECTRA_MISSING_RECEIPTS : `excelDownloads/${newdate}/spectra-mising-receipts.xlsx` ,
-    SPECTRA_MISMATCH_RECEIPTS : `excelDownloads/${newdate}/spectra-mismtach-receipts.xlsx`,
+    //RECEIPT OUTPUT EXCELS
+    SPRINGS_MISSING_RECEIPTS :  `excelDownloads/${newdate}/springs-receiptsLogs.xlsx`,
+    SPIRE_MISSING_RECEIPTS : `excelDownloads/${newdate}/spire-receiptsLogs.xlsx`,
+    SPECTRA_MISSING_RECEIPTS : `excelDownloads/${newdate}/spectra-receiptsLogs.xlsx` ,
+
+    //Costsheet outpu excels
     SPECTRA_COSTSHEET_EXCEL : `excelDownloads/${newdate}/spectra-costsheet.xlsx`,
     SPRINGS_COSTSHEET_EXCEL : `excelDownloads/${newdate}/springs-costsheet.xlsx`,
-    SPIRE_COSTSHEET_EXCEL : `excelDownloads/${newdate}/spire-costsheet.xlsx`
-    
+    SPIRE_COSTSHEET_EXCEL : `excelDownloads/${newdate}/spire-costsheet.xlsx`,
+    SPECTRA_SALEPARTICULARS : `excelDownloads/${newdate}/spectra-saleparticulars.xlsx` ,
+    SPIRE_SALEPARTICULARS : `excelDownloads/${newdate}/spire-saleparticulars.xlsx`  ,
+    SPRINGS_SALEPARTICULARS : `excelDownloads/${newdate}/springs-saleparticulars.xlsx`
 }
