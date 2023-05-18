@@ -5,6 +5,17 @@ const year = dateObj.getUTCFullYear();
 const newdate = year + "-" + month + "-" + day;
 
 export const HEADERS = {
+    //costsheet 
+    ISSUE : 'ISSUE',
+    SCR : 'SCR',
+    SYSTEM : 'SYSTEM',
+    STATUS : 'STATUS',
+    COMMENTS : 'COMMENTS',
+    //receiptlogs
+    AMOUNT : 'AMOUNT',
+
+    MISSINGCOSTSHEET : 'Csheet output',
+    USER_MISSINGDATA : 'User MisisngData',
     PAYMENTTYPE : 'PAYMENT TYPE',
     SNO : 'SNO' ,
     DATE : 'date',
@@ -94,8 +105,14 @@ export const SHEETS = {
 }
 
 export const EXCELS = {
+    //costsheeet
+    SPIRE : 'SPIRE',
+    SPRINGS : 'SPRINGS',
+    SPECTRA : 'SPECTRA',
     USERDETAILS_EXCEL : `excelDownloads/${newdate}/spectra-userdetails.xlsx`,
-    
+    SPIRE_MISMATCH : 'SPIRE-MISMATCHDATA',
+    SPECTRA_MISMATCH : 'SPECTRA-MISMATCHDATA',
+    SPRINGS_MISMTACH : 'SPRINGS-MISMATCHDATA',
     FLAT_USERS_DETAILS : 'user-details.xlsx' ,
     MISMATCH_FLATS : 'mismatch-saleparticulars.xlsx',
     MISSING_FLATS : 'missing-flats-inSystem.xlsx',
@@ -104,6 +121,7 @@ export const EXCELS = {
     MISMATCH_COSTSHEET : 'mismatch costsheets',
     INSYSTEM_NOTINSCR : 'inSystemNotInSCRFlats',
     MISSING_COSTSHEET : 'missing costsheets',
+    MISSING_USERDETAILS : 'missing-userdetails',
     SUSPENSE_LUMPSUM_NORECEIPTNO : 'suspense-cancelled-noreceiptno',
 
     SPIREFLATSALEPARTUCULARSMISMATCH : `excelDownloads/spire-flatSaleParticulars-Mismatching-Data.xlsx`,
@@ -122,5 +140,12 @@ export const EXCELS = {
     SPIRE_COSTSHEET_EXCEL : `excelDownloads/${newdate}/spire-costsheet.xlsx`,
     SPECTRA_SALEPARTICULARS : `excelDownloads/${newdate}/spectra-saleparticulars.xlsx` ,
     SPIRE_SALEPARTICULARS : `excelDownloads/${newdate}/spire-saleparticulars.xlsx`  ,
-    SPRINGS_SALEPARTICULARS : `excelDownloads/${newdate}/springs-saleparticulars.xlsx`
+    SPRINGS_SALEPARTICULARS : `excelDownloads/${newdate}/springs-saleparticulars.xlsx`,
+
+    COSTSHEET : `excelDownloads/${newdate}/CostSheet.xlsx`,
+    LOANDETAILS : `excelDownloads/${newdate}/LoanDetails.xlsx`,
+    COLECTION_LOGS : `excelDownloads/${newdate}/CollectionLogs.xlsx`,
+    SALE_PARTICULARS : `excelDownloads/${newdate}/SaleParticulars.xlsx`,
+    FLAT_MIS_DETAILS : `excelDownloads/${newdate}/Flat-Mis-Details.xlsx`
+
 }

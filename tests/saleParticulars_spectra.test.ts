@@ -2,6 +2,7 @@ import {expect , test} from '@playwright/test'
 import { apiRequestSaleParticulars, createFolder } from '../generic/apiRequest_spectra';
 import { EXCELS,EXCELJS, RESPONSE,HEADERS,PATH, SHEETS } from '../constants';
 import { SPECTRA } from '../meta';
+const fs = require('fs')
 let flatDetails : any = {};
 let grossAmountDetails :any  = {};
 let saleparticular_Details : any = {};
@@ -17,26 +18,40 @@ test ("spectra Sale Particulars" , async () => {
     await workbook.xlsx.readFile(SPECTRA.SCR_EXCEL);
     const worksheet = workbook.getWorksheet(SHEETS.RECEIVABLELOGS_DATA);
     const worksheet1 = workbook.getWorksheet(SHEETS.MASTER_DATA);
-    const workbook1 = new ExcelJS.Workbook();
-    const missingFlats = workbook1.addWorksheet(EXCELS.MISSING_FLATS);
-    const missmatchFlats = workbook1.addWorksheet(EXCELS.MISMATCH_FLATS);
+    
+    let workbook1 = new ExcelJS.Workbook();
+    let workbook2 = new ExcelJS.Workbook();
+    await createFolder();
+    const path = require(PATH);
+    const filePath1 = path.join(__dirname, EXCELS.SALE_PARTICULARS);
+    const filepath2 = path.join(__dirname , EXCELS.FLAT_MIS_DETAILS)
 
-    missingFlats.columns = [
-        { header: HEADERS.SNO, key: 'sNo' },
-        { header: HEADERS.FLATNO, key: 'flatNo' },
+    if(fs.existsSync(filePath1))
+        await workbook1.xlsx.readFile(filePath1);
+    if(fs.existsSync(filepath2))
+       await workbook2.xlsx.readFile(filepath2);
+
+    const saleparticulars = workbook1.addWorksheet(EXCELS.SPECTRA);
+    const flat_mis = workbook2.addWorksheet(EXCELS.SPECTRA);
+
+    saleparticulars.columns = [
+        { header : HEADERS.SNO , key : 'sNo'},
+        { header : HEADERS.FLATNO , key : 'flatNo'},
+        { header : HEADERS.ISSUE , key : 'Issue'},
+        { header : HEADERS.SCR , key : 'scr'},
+        { header : HEADERS.SYSTEM , key : 'system'},
+        { header : HEADERS.STATUS , key : 'status'},
+        { header : HEADERS.COMMENTS , key : 'comments'},
     ];
     
-    missmatchFlats.columns = [
-        { header: HEADERS.SNO, key: 'sNo' },
-        { header: HEADERS.FLATNO, key: 'flatNo' },
-        { header: HEADERS.TOTALAMOUNTFROMEXCEL, key: 'toatlAmountExcel' },
-        { header: HEADERS.TOTALAMOUNTFROMSYSTEM, key: 'toatlAmountSystem' },
-        { header: HEADERS.ACCUREDAMOUNTFROMEXCEL, key: 'accuredAmountExcel'},
-        { header: HEADERS.ACCUREDAMOUNTFROMSYSTEM, key: 'accuredAmountSystem' },
-        { header: HEADERS.COLLECTEDAMOUNTFROMEXCEL, key: 'collectedAmountExcel' },
-        { header: HEADERS.COLLECTEDAMOUNTFROMSYSTEM, key: 'collectedAmountSystem' },
-        { header: HEADERS.RECEIVABLEAMOUNTFROMEXCEL, key: 'receivableAmountExcel' },
-        { header: HEADERS.RECEIVABLEAMOUNTFROMSYSTEM, key: 'receivableAmountSystem' }
+    flat_mis.columns = [
+        { header : HEADERS.SNO , key : 'sNo'},
+        { header : HEADERS.FLATNO , key : 'flatNo'},
+        { header : HEADERS.ISSUE , key : 'Issue'},
+        { header : HEADERS.SCR , key : 'scr'},
+        { header : HEADERS.SYSTEM , key : 'system'},
+        { header : HEADERS.STATUS , key : 'status'},
+        { header : HEADERS.COMMENTS , key : 'comments'},
     ];
 
     const rowcount = worksheet.rowCount;    
@@ -53,8 +68,7 @@ test ("spectra Sale Particulars" , async () => {
         }
         if(flatDetails.accruedAmount != 0)
         {
-        saleParticulars_scr.set(String(flatDetails.flatNumber) , {'flatNumber' : flatDetails.flatNumber, 'accruedAmount' : flatDetails.accruedAmount , 'collectedAmount' : flatDetails.collectedAmount , 'receivableAmount' : flatDetails.receivableAmount})
-    
+            saleParticulars_scr.set(String(flatDetails.flatNumber) , {'flatNumber' : flatDetails.flatNumber, 'accruedAmount' : flatDetails.accruedAmount , 'collectedAmount' : flatDetails.collectedAmount , 'receivableAmount' : flatDetails.receivableAmount})
         }
     }
 
@@ -117,56 +131,82 @@ test ("spectra Sale Particulars" , async () => {
                     flag = 0;
                     saleParticularsTypes.totalAmtExl =  total_scr.totalAmount ;
                     saleParticularsTypes.totalAmtSys =  saleParticularFromSystem.totalAmount ;
+                    saleparticulars.addRow({
+                        sNo: count1++,
+                        flatNo: key,
+                        Issue : 'Total Amount',
+                        scr : saleParticularsTypes.totalAmtExl,
+                        system : saleParticularsTypes.totalAmtSys
+                        });
                 }
                 if(Math.abs(saleParticularSCR.accruedAmount- saleParticularFromSystem.accruedAmount) > 10)
                 {
                     flag = 0;
                     saleParticularsTypes.accuredAmtExl = saleParticularSCR.accruedAmount
                     saleParticularsTypes.accuredAmtSys = saleParticularFromSystem.accruedAmount
+                    saleparticulars.addRow({
+                        sNo: count1++,
+                        flatNo: key,
+                        Issue : 'Accrued Amount',
+                        scr : saleParticularsTypes.accuredAmtExl,
+                        system : saleParticularsTypes.accuredAmtSys
+                        });
                 }
                 if(Math.abs(saleParticularSCR.collectedAmount - saleParticularFromSystem.collectedAmount)> 10)
                 {
                     flag = 0 ;
                     saleParticularsTypes.collectedAmtExl = saleParticularSCR.collectedAmount
                     saleParticularsTypes.collectedASys = saleParticularFromSystem.collectedAmount
+                    saleparticulars.addRow({
+                        sNo: count1++,
+                        flatNo: key,
+                        Issue : 'Collected Amount',
+                        scr : saleParticularsTypes.collectedAmtExl,
+                        system : saleParticularsTypes.collectedASys
+                        });
                 }
                 if(Math.abs(saleParticularSCR.receivableAmount - saleParticularFromSystem.receivableAmount) > 10)
                 {
                     flag = 0;
                     saleParticularsTypes.recAmtExl = saleParticularSCR.receivableAmount
                     saleParticularsTypes.recAmtSys = saleParticularFromSystem.receivableAmount
+                    saleparticulars.addRow({
+                        sNo: count1++,
+                        flatNo: key,
+                        Issue : 'Receivable Amount',
+                        scr : saleParticularsTypes.recAmtExl,
+                        system : saleParticularsTypes.recAmtSys
+                        });
                 }
-                if(flag == 0)
-                {
-                    missmatchFlats.addRow({
-                            sNo: count1++,
-                            flatNo: key,
-                            toatlAmountExcel: saleParticularsTypes.totalAmtExl,
-                            toatlAmountSystem :saleParticularsTypes.totalAmtSys ,
-                            accuredAmountExcel : saleParticularsTypes.accuredAmtExl,
-                            accuredAmountSystem :saleParticularsTypes.accuredAmtSys ,
-                            collectedAmountExcel : saleParticularsTypes.collectedAmtExl,
-                            collectedAmountSystem : saleParticularsTypes.collectedASys ,
-                            receivableAmountExcel: saleParticularsTypes.recAmtExl,
-                            receivableAmountSystem: saleParticularsTypes.recAmtSys,
-                            });
-                }
-                flag = 1;
         }
         else
         {
             if(key != 'null')
             {
-                missingFlats.addRow({
+                flat_mis.addRow({
                     sNo: count++,
                     flatNo: key,
-                });
+                    Issue : 'Missing-Flat',
+                    scr : 'present',
+                    system : 'missing'
+                    });
            }
         }
     }
+    for(const [key, value] of saleParticulars_system.entries())
+    {
+        if(saleParticulars_scr.has(key) == false)
+        {
+            flat_mis.addRow({
+                sNo: count++,
+                flatNo: key,
+                Issue : 'Missing-Flat',
+                scr : 'missing',
+                system : 'present'
+                });
+        }
+    }
         
-    await createFolder();
-    const path = require(PATH);
-    const filePath = path.join(__dirname, EXCELS.SPECTRA_SALEPARTICULARS);
-    await workbook1.xlsx.writeFile(filePath);
+    await workbook1.xlsx.writeFile(filePath1);
+    await workbook2.xlsx.writeFile(filepath2);
 }); 
