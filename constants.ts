@@ -149,3 +149,104 @@ export const EXCELS = {
     FLAT_MIS_DETAILS : `excelDownloads/${newdate}/Flat-Mis-Details.xlsx`
 
 }
+
+export const BANK = {
+    AXIS : 'axis',
+    BHFL : 'bhfl',
+    HDFC : 'hdfc',
+    BOB : 'bob',
+    ICICI : 'icici',
+    KOTAK : 'kotak',
+    LICHFL : 'lichfl',
+    SBI : 'sbi',
+    AIR_FORCE : 'air force',
+    ONGC : 'ongc',
+    TCHFL : 'tchfl'
+}
+
+export const BHFL = {
+    POC_NAME : 'Pavan Paladhi',
+    POC_CONTACT : '+919133469900',
+    POC_EMAIL : 'pavankumar.paladhi@bajajfinserv.in'
+}
+export const BHFL_HARISH = {
+    POC_NAME : 'Harish',
+    POC_CONTACT : '+919492908569',
+    POC_EMAIL : 'harish.vallarapu@bajajfinserv.in'
+}
+
+export const AXIS = {
+    POC_NAME : 'Rajesh',
+    POC_CONTACT : '+919666369756',
+    POC_EMAIL : '268585@axisbank.com'
+}
+export const AXIS_RAJESH = {
+    POC_NAME : 'Rajesh',
+    POC_CONTACT : '+919666369756',
+    POC_EMAIL : '268585@axisbank.com'
+}
+
+export const AXIS_PRASANNA = {
+    POC_NAME : 'Prasanna Kumar',
+    POC_CONTACT : '+919849156407',
+    POC_EMAIL : 'prams321@gmail.com'
+}
+
+export const BANK_OF_BARODA = {
+    POC_NAME : 'Prasanna Kumar',
+    POC_CONTACT : '+919849156407',
+    POC_EMAIL : 'prams321@gmail.com'
+}
+
+export const HDFC = {
+    POC_NAME : 'Prasanna Kumar',
+    POC_CONTACT : '+919849156407',
+    POC_EMAIL : 'prams321@gmail.com'
+}
+export const HDFC_LTD = {
+    POC_NAME : 'Gopala Krishna Kinnera',
+    POC_CONTACT : '+919160696563',
+    POC_EMAIL : 'gopalakrishna@hdfcsales.com'
+}
+
+export const ICICI = {
+    POC_NAME : 'Ponnam Satish',
+    POC_CONTACT : '+919000196605',
+    POC_EMAIL : 'kolusu.madhavi@icicibank.com'
+}
+export const ICICI_SPRINGS = {
+    POC_NAME : 'Prasanna Kumar',
+    POC_CONTACT : '+919849156407',
+    POC_EMAIL : 'prams321@gmail.com'
+}
+
+export const KOTAK = {
+    POC_NAME : 'Anil',
+    POC_CONTACT : '+919505622228',
+    POC_EMAIL : 'mallempati.anil@kotak.com'
+}
+
+export const KOTAK_OTHERS = {
+    POC_NAME : 'Madhuri Mevada',
+    POC_CONTACT : '+918977508820',
+    POC_EMAIL : 'madhuri.mevada@kotak.com'
+}
+
+export const BOB = {
+    POC_NAME : 'Prasanna Kumar',
+    POC_CONTACT : '+919849156407',
+    POC_EMAIL : 'prams321@gmail.com'
+}
+
+export const SBI_PRASANNA = {
+    POC_NAME : 'Prasanna Kumar',
+    POC_CONTACT : '+919849156407',
+    POC_EMAIL : 'prams321@gmail.com'
+}
+
+export const SBI_ANAND = {
+    POC_NAME : 'Anand',
+    POC_CONTACT : '+919493809666',
+    POC_EMAIL : 'Vulpeeanandkumar@gmail.com'
+}
+

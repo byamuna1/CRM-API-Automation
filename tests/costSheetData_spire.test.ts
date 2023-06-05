@@ -1,20 +1,24 @@
 import {expect , test} from '@playwright/test'
 import { apiRequestFlatCostSheetDetails, apiRequestFlatDetails,  createFolder } from '../generic/apiRequest_spire';
-import { EXCELS, RESPONSE, SHEETS, EXCELJS, HEADERS, PATH } from '../constants';
+import { EXCELS, RESPONSE, SHEETS, EXCELJS, HEADERS, PATH, BANK, AXIS, AXIS_PRASANNA, AXIS_RAJESH, BHFL, HDFC, HDFC_LTD } from '../constants';
 import { SPIRE } from '../meta';
 const fs = require('fs')
 let costSheetDetailsForomScr : any = {};
+let bankDetailsFromScr : any = {};
 let missingCount = 1 , mismatchCount = 1, costflag = 1;
 let scrCostSheet = new Map<any,any>()
+let bankDetails = new Map<any, any>();
 let systemcostsheet = new Map<any, any>()
 
 test ("spire costsheet Data" , async () => {
+
     const ExcelJS = require(EXCELJS);
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(SPIRE.SCR_EXCEL);
     const worksheet = workbook.getWorksheet(SHEETS.MASTER_DATA);
-    
-   let workbook1 = new ExcelJS.Workbook();
+    const worksheet1 = workbook.getWorksheet(SHEETS.RECEIVABLELOGS_DATA)
+
+    let workbook1 = new ExcelJS.Workbook();
     let workbook2 = new ExcelJS.Workbook();
     await createFolder();
     const path = require(PATH);
@@ -24,7 +28,7 @@ test ("spire costsheet Data" , async () => {
     if(fs.existsSync(filePath1))
         await workbook1.xlsx.readFile(filePath1);
     if(fs.existsSync(filePath2))
-        await workbook1.xlsx.readFile(filePath2);
+        await workbook2.xlsx.readFile(filePath2);
 
     const mismatchData = workbook1.addWorksheet(EXCELS.SPIRE);
     const bank_details = workbook2.addWorksheet(EXCELS.SPIRE)
@@ -102,7 +106,25 @@ test ("spire costsheet Data" , async () => {
         }
         costSheetDetailsForomScr = {}
     }
+    //bank details 
+    const rowCount1 = worksheet1.rowCount;
+    for(let i=4; i< 2000; i++)
+    {
+        const row = worksheet1.getRow(i) ;
+        bankDetailsFromScr = {
+            sNo : row.getCell(1).value?.result??row.getCell(1).value,
+            flatNumber : row.getCell(2).value ,
+            accruedAmount : row.getCell(4).value?.result??0 ,
+            bankName : row.getCell(8).value?.result??row.getCell(8).value,
+        }
 
+        if(bankDetailsFromScr.accruedAmount != 0 && bankDetailsFromScr.sNo >= 0)
+        {
+            //console.log(bankDetailsFromScr)
+            bankDetails.set(String(bankDetailsFromScr.flatNumber) , {'bankName' : bankDetailsFromScr.bankName})
+        }
+        bankDetailsFromScr = {}
+    }
     
     const res = await apiRequestFlatDetails();
     for(let index=0; index<res.data.length ; index++)
@@ -401,50 +423,296 @@ test ("spire costsheet Data" , async () => {
         {
             if(result.data.saleDetails.paymentType == 'LOAN')
             {
-                let scr_sheet = scrCostSheet.get(String(result.data[RESPONSE.FLATNUMBER]))
-                let bank_flag = result.data.saleDetails.bank.length;
-                if(bank_flag == 0)
+                let bank_sheet = scrCostSheet.get(String(result.data[RESPONSE.FLATNUMBER]))
+                if(result.data.saleDetails.paymentType == 'SELF') 
                 {
-                    let bank = scr_sheet.bank ;
-                    if(scr_sheet.bankName == null)
-                       bank = 'No bank'
-                    bank_details.addRow({
-                        sNo : missingCount++ ,
-                        flatNo : result.data[RESPONSE.FLATNUMBER],
-                        Issue : 'missing bank in system',
-                        scr : bank,
-                        system : 'No bank'
-                    })
-                }
-                else
-                {
-                    //console.log(scr_sheet.bankName , result.data.saleDetails.bank[0]['name'] )
-                    let bank ;
-                    if(String(scr_sheet.bankName).trim() == 'BHFL')
-                       bank = 'BAJAJ HOUSING FINANCE LIMITED'
-                    else if(String(scr_sheet.bankName).trim() == 'Axis Bank')
-                        bank = 'AXIS BANK LIMITED'
-                    else if(String(scr_sheet.bankName).trim() == 'HDFC Bank')
-                        bank = 'HDFC LIMITED'
-                    if(bank != result.data.saleDetails.bank[0]['name'])
+                    let bank_sheet = bankDetails.get(String(result.data[RESPONSE.FLATNUMBER]))
+                    if(String(bank_sheet.bankName).trim() != 'SELF' && bank_sheet.bankName != null)
                     {
-                        if(scr_sheet.bankName == null)
-                            bank = 'No bank'
                         bank_details.addRow({
                             sNo : missingCount++ ,
                             flatNo : result.data[RESPONSE.FLATNUMBER],
-                            Issue : 'mismatch bank',
-                            scr : bank,
-                            system : result.data.saleDetails.bank[0]['name']
+                            Issue : 'Mismatch-Bank',
+                            scr : bank_sheet.bankName,
+                            system : result.data.saleDetails.paymentType
                         })
+                    }
+                }
+                else if(result.data.saleDetails.paymentType == 'LOAN')
+                {
+                    let bank_sheet = bankDetails.get(String(result.data[RESPONSE.FLATNUMBER]))
+                    let bank_flag = result.data.saleDetails.bank.length;
+                    if(bank_flag == 0 || String(bank_sheet.bankName).trim() == 'SELF')
+                    {
+                        let bank = bank_sheet.bankName ;
+                        if(bank_sheet.bankName == null)
+                           bank = 'No bank'
+                        bank_details.addRow({
+                            sNo : missingCount++ ,
+                            flatNo : result.data[RESPONSE.FLATNUMBER],
+                            Issue : 'Missing-Bank',
+                            scr : String(bank_sheet.bankName),
+                            system : 'No bank'
+                        })
+                    }
+                    else
+                    {
+                        let bank = '';
+                        const bankFromScr = String(bank_sheet.bankName).toLowerCase().trim()
+                        if(bankFromScr.includes(BANK.AXIS))
+                        {
+                            bank = 'AXIS BANK LIMITED' ;
+                            
+                                if(result.data.loanDetails['poc'])
+                                {
+                                    if(bankFromScr == 'axis-rajesh')
+                                    {
+                                
+                                        if(AXIS_RAJESH.POC_NAME != result.data.loanDetails['poc']['name'])
+                                            {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCName',
+                                                    scr : AXIS_RAJESH.POC_NAME,
+                                                    system : result.data.loanDetails['poc']['name']
+                                                })
+                                            }
+                                        if(result.data.loanDetails['poc']['phoneNumber'] )
+                                            {
+                                                if( AXIS_RAJESH.POC_CONTACT != result.data.loanDetails['poc']['phoneNumber'].replaceAll(" ",""))
+                                                {
+                                                    bank_details.addRow({
+                                                        sNo : missingCount++ ,
+                                                        flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                        Issue : 'Mismatch-POCContact',
+                                                        scr : AXIS_RAJESH.POC_CONTACT,
+                                                        system : result.data.loanDetails['poc']['phoneNumber']
+                                                    })
+                                                }
+                                            }
+                                        if(AXIS_RAJESH.POC_EMAIL != result.data.loanDetails['poc']['email'])
+                                            {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCEmail',
+                                                    scr : AXIS_RAJESH.POC_EMAIL,
+                                                    system : result.data.loanDetails['poc']['email']
+                                                })
+                                            }
+                                    }
+                                    if(bankFromScr == 'axis-prasanna')
+                                    {
+                                        if(AXIS_PRASANNA.POC_NAME != result.data.loanDetails['poc']['name'])
+                                            {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCName',
+                                                    scr : AXIS_PRASANNA.POC_NAME,
+                                                    system : result.data.loanDetails['poc']['name']
+                                                })
+                                            }
+                                        if(result.data.loanDetails['poc']['phoneNumber'] )
+                                            {
+                                                if(AXIS_PRASANNA.POC_CONTACT != result.data.loanDetails['poc']['phoneNumber'].replaceAll(" ",""))
+                                                {
+                                                    bank_details.addRow({
+                                                        sNo : missingCount++ ,
+                                                        flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                        Issue : 'Mismatch-POCContact',
+                                                        scr : AXIS_PRASANNA.POC_CONTACT,
+                                                        system : result.data.loanDetails['poc']['phoneNumber']
+                                                    })
+                                                }
+                                            }
+                                        if(AXIS_PRASANNA.POC_EMAIL != result.data.loanDetails['poc']['email'])
+                                            {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCEmail',
+                                                    scr : AXIS_PRASANNA.POC_EMAIL,
+                                                    system : result.data.loanDetails['poc']['email']
+                                                })
+                                            }
+                                    }
+                                }
+                                else if(bankFromScr != 'axis-others')
+                                {
+                                    bank_details.addRow({
+                                        sNo : missingCount++ ,
+                                        flatNo : result.data[RESPONSE.FLATNUMBER],
+                                        Issue : 'Poc not Tagged',
+                                        scr : bank_sheet.bankName,
+                                        system : 'not tagged'
+                                    })
+                                }
+                        }
+                        else if(bankFromScr.includes(BANK.BHFL))
+                        {
+                            bank = 'BAJAJ HOUSING FINANCE LIMITED'
+                            if(result.data.loanDetails['poc'])
+                            {
+                                if(bankFromScr == 'bhfl' || bankFromScr == 'bhfl-others')
+                                {
+                                    
+                                    if(BHFL.POC_NAME != result.data.loanDetails['poc']['name'])
+                                    {
+                                        bank_details.addRow({
+                                            sNo : missingCount++ ,
+                                            flatNo : result.data[RESPONSE.FLATNUMBER],
+                                            Issue : 'Mismatch-POCName',
+                                            scr : BHFL.POC_NAME,
+                                            system : result.data.loanDetails['poc']['name']
+                                        })
+                                    }
+                                    if(result.data.loanDetails['poc']['phoneNumber'])
+                                    {
+                                    
+                                        if(BHFL.POC_CONTACT != result.data.loanDetails['poc']['phoneNumber'].replaceAll(" ",""))
+                                        {
+                                            bank_details.addRow({
+                                                sNo : missingCount++ ,
+                                                flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                Issue : 'Mismatch-POCContact',
+                                                scr : BHFL.POC_CONTACT,
+                                                system : result.data.loanDetails['poc']['phoneNumber']
+                                            })
+                                        }
+                                    }
+                                    if(BHFL.POC_EMAIL != result.data.loanDetails['poc']['email'])
+                                    {
+                                        bank_details.addRow({
+                                            sNo : missingCount++ ,
+                                            flatNo : result.data[RESPONSE.FLATNUMBER],
+                                            Issue : 'Mismatch-POCEmail',
+                                            scr : BHFL.POC_EMAIL,
+                                            system : result.data.loanDetails['poc']['email']
+                                        })
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bank_details.addRow({
+                                    sNo : missingCount++ ,
+                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                    Issue : 'Poc not Tagged',
+                                    scr : bank_sheet.bankName,
+                                    system : 'not tagged'
+                                })
+                            }
+                        }
+                        else if(bankFromScr.includes(BANK.HDFC))
+                        {
+                            bank = 'HDFC LIMITED'
+                            if(result.data.loanDetails['poc'])
+                            {
+                                if(bankFromScr == 'hdfc')
+                                {
+                                        if(HDFC.POC_NAME != result.data.loanDetails['poc']['name'])
+                                        {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCName',
+                                                    scr : HDFC.POC_NAME,
+                                                    system : result.data.loanDetails['poc']['name']
+                                                })
+                                        }
+                                        if(result.data.loanDetails['poc']['phoneNumber'] )
+                                        {
+                                            if(HDFC.POC_CONTACT != result.data.loanDetails['poc']['phoneNumber'].replaceAll(" ",""))
+                                            {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCContact',
+                                                    scr : HDFC.POC_CONTACT,
+                                                    system : result.data.loanDetails['poc']['phoneNumber']
+                                                })
+                                            }
+                                        }
+                                        if(HDFC.POC_EMAIL != result.data.loanDetails['poc']['email'])
+                                        {
+                                            bank_details.addRow({
+                                                sNo : missingCount++ ,
+                                                flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                Issue : 'Mismatch-POCEmail',
+                                                scr : HDFC.POC_EMAIL,
+                                                system : result.data.loanDetails['poc']['email']
+                                            })
+                                        }
+                                }
+                                else if(bankFromScr == 'hdfc ltd' || bankFromScr == 'hdfc-others' )
+                                {
+                                    if(HDFC_LTD.POC_NAME != result.data.loanDetails['poc']['name'])
+                                    {
+                                            bank_details.addRow({
+                                                sNo : missingCount++ ,
+                                                flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                Issue : 'Mismatch-POCName',
+                                                scr : HDFC_LTD.POC_NAME,
+                                                system : result.data.loanDetails['poc']['name']
+                                            })
+                                    }
+                                    if(result.data.loanDetails['poc']['phoneNumber'] )
+                                    {
+                                        if( HDFC_LTD.POC_CONTACT != result.data.loanDetails['poc']['phoneNumber'].replaceAll(" ",""))
+                                        {
+                                                bank_details.addRow({
+                                                    sNo : missingCount++ ,
+                                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                    Issue : 'Mismatch-POCContact',
+                                                    scr : HDFC_LTD.POC_CONTACT,
+                                                    system : result.data.loanDetails['poc']['phoneNumber']
+                                                })
+                                        }
+                                    }
+                                    if(HDFC_LTD.POC_EMAIL != result.data.loanDetails['poc']['email'])
+                                    {
+                                        bank_details.addRow({
+                                                sNo : missingCount++ ,
+                                                flatNo : result.data[RESPONSE.FLATNUMBER],
+                                                Issue : 'Mismatch-POCEmail',
+                                                scr : HDFC_LTD.POC_EMAIL,
+                                                system : result.data.loanDetails['poc']['email']
+                                            })
+                                    }
+                                }
+                            }
+                            else if(bankFromScr != 'hdfc-others')
+                            {
+                                bank_details.addRow({
+                                    sNo : missingCount++ ,
+                                    flatNo : result.data[RESPONSE.FLATNUMBER],
+                                    Issue : 'Poc not Tagged',
+                                    scr : bank_sheet.bankName,
+                                    system : 'not tagged'
+                                })
+                            }
+                        }
+                        if(bank != result.data.saleDetails.bank[0]['name'])
+                        {
+                            bank_details.addRow({
+                                sNo : missingCount++ ,
+                                flatNo : result.data[RESPONSE.FLATNUMBER],
+                                Issue : 'Mismatch-Bank',
+                                scr : String(bank_sheet.bankName),
+                                system : result.data.saleDetails.bank[0]['name']
+                            })
+                        }
+
                     }
 
                 }
             }
         }
-        flag = 0 
     }
     
     await workbook1.xlsx.writeFile(filePath1);
+    await workbook2.xlsx.writeFile(filePath2);
       
 }); 

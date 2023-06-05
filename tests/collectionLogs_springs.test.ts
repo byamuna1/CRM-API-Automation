@@ -112,7 +112,7 @@ test ("springs ReceiptLogs Details" , async () => {
                     system: receiptLogs_types.receiptAmountfromSystem,
                });
             }
-            if(String(receiptfromSystem.referenceNumber).trim() != String(receiptfromSCR.referenceNumber).trim()) 
+            if(String(receiptfromSCR.referenceNumber).trim().includes(String(receiptfromSystem.referenceNumber).trim()) == false) 
             {
                 flag = 1; 
                 receiptLogs_types.referenceNofromscr = receiptfromSCR.referenceNumber ;
