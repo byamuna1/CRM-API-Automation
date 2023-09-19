@@ -54,7 +54,7 @@ test ("springs costsheet Data" , async () => {
 // master data reading
     const rowcount = worksheet.rowCount;  
     
-    for(let i=6; i<5000; i++)
+    for(let i=6; i<rowcount; i++)
     {
         const row = worksheet.getRow(i) ;
         costSheetDetailsForomScr = {
@@ -105,7 +105,7 @@ test ("springs costsheet Data" , async () => {
     }
     //bank details 
     const rowCount1 = worksheet1.rowCount;
-    for(let i=4; i< 2000; i++)
+    for(let i=4; i< rowCount1; i++)
     {
         const row = worksheet1.getRow(i) ;
         bankDetailsFromScr = {

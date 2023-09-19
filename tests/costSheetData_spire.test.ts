@@ -56,7 +56,7 @@ test ("spire costsheet Data" , async () => {
     // master data reading
     const rowcount = worksheet.rowCount;  
     
-    for(let i=6; i<100; i++)
+    for(let i=6; i<rowcount; i++)
     {
         const row = worksheet.getRow(i) ;
         costSheetDetailsForomScr = {
@@ -79,7 +79,8 @@ test ("spire costsheet Data" , async () => {
                 pocContact : row.getCell(81).value,
                 pocEmail : row.getCell(82).value?.text??row.getCell(82).value,
                 }
-        
+        if(costSheetDetailsForomScr.flatNumber == '3506')
+        console.log(costSheetDetailsForomScr)
         if(costSheetDetailsForomScr.statusOfFLat == RESPONSE.BOOKED || costSheetDetailsForomScr.statusOfFLat == RESPONSE.booked)
         {
             //console.log(costSheetDetailsForomScr)
@@ -108,7 +109,7 @@ test ("spire costsheet Data" , async () => {
     }
     //bank details 
     const rowCount1 = worksheet1.rowCount;
-    for(let i=4; i< 2000; i++)
+    for(let i=4; i< rowCount1; i++)
     {
         const row = worksheet1.getRow(i) ;
         bankDetailsFromScr = {
@@ -166,6 +167,8 @@ test ("spire costsheet Data" , async () => {
         let flatID : string = res.data[index][RESPONSE.ID] ;
         const result = await apiRequestFlatCostSheetDetails(flatID);
         let flag = result.data.saleParticulars.otherParticulars ? 1 : 0;
+        if(result.data[RESPONSE.FLATNUMBER] == '3506')
+        console.log(result.data.saleParticulars.otherParticulars[0].costs)
         costflag = 0;
             if(flag != 0)
             {
@@ -203,6 +206,8 @@ test ("spire costsheet Data" , async () => {
                         {
                             costsheet_types.floorRiseSystem = result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL];
                             costsheet_types.floorRise = scr_sheet.floorRise ;
+                            if(result.data[RESPONSE.FLATNUMBER] == '3506')
+                             console.log( costsheet_types.floorRiseSystem, costsheet_types.floorRise)
                             if(Math.abs(result.data.saleParticulars.otherParticulars[0][RESPONSE.COSTS][c][RESPONSE.TOTAL] - scr_sheet.floorRise) > 4)
                             {                            
                                 costflag++ ;
@@ -341,7 +346,7 @@ test ("spire costsheet Data" , async () => {
                         });
                         
                     }
-                        if(costsheet_types.basicCost == null && costsheet_types.basicCostSystem == null && basicprice > 0)
+                    if(costsheet_types.basicCost == null && costsheet_types.basicCostSystem == null && basicprice > 0)
                     {
                         mismatchData.addRow({
                             sNo : mismatchCount++,

@@ -53,7 +53,7 @@ test ("spectra costsheet Data" , async () => {
         { header : HEADERS.COMMENTS , key : 'comments'},
     ];
     // master data reading 
-    const rowcount = worksheet.rowCount;  
+    //const rowcount = worksheet.rowCount;  
     
     for(let i=6; i<5000; i++)
     {
@@ -108,7 +108,7 @@ test ("spectra costsheet Data" , async () => {
     }
 
     //bank details 
-    const rowCount1 = worksheet1.rowCount;
+    //const rowCount1 = worksheet1.rowCount;
     for(let i=4; i< 2000; i++)
     {
         const row = worksheet1.getRow(i) ;

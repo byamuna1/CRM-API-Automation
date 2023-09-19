@@ -101,7 +101,8 @@ export const EXCELJS = 'exceljs'
 export const SHEETS = {
    MASTER_DATA : 'Master Data',
    RECEIVABLELOGS_DATA : 'Rec. St',
-   RECEIPTLOGS_DATA : 'Coll Log'
+   RECEIPTLOGS_DATA : 'Coll Log',
+   MCD : 'MCD'
 }
 
 export const EXCELS = {
@@ -146,7 +147,8 @@ export const EXCELS = {
     LOANDETAILS : `excelDownloads/${newdate}/LoanDetails.xlsx`,
     COLECTION_LOGS : `excelDownloads/${newdate}/CollectionLogs.xlsx`,
     SALE_PARTICULARS : `excelDownloads/${newdate}/SaleParticulars.xlsx`,
-    FLAT_MIS_DETAILS : `excelDownloads/${newdate}/Flat-Mis-Details.xlsx`
+    FLAT_MIS_DETAILS : `excelDownloads/${newdate}/Flat-Mis-Details.xlsx`,
+    MISMATCH_MCD : `excelDownloads/${newdate}/mcd-data.xlsx`,
 
 }
 

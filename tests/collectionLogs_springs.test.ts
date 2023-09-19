@@ -50,7 +50,7 @@ test ("springs ReceiptLogs Details" , async () => {
         
     }
    
-    for(let i = 6;i<5000;i++)
+    for(let i = 6;i<10000;i++)
     {
         const row = worksheet.getRow(i) ;
         receiptDetails ={

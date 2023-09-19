@@ -45,6 +45,12 @@ export const apiRequestReceiptLogs = (async (search_term : string) => {
     return ( response.data.data.collections);
 }); 
 
+export const apiRequestmcd = (async () => {
+    const url = `https://test.crmadmin.inncircles.com/api/mcd-screen?sortBy=%7B%22_id%22:1%7D&filter=%7B%7D`;  
+    const response = await axios.get(url ,{ headers : headers});
+    return ( response.data.data.logs);
+});
+
 export const createFolder =(async()=>{
     const fs = require('fs');
     const dateObj = new Date();
