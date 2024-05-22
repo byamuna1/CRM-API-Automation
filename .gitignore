@@ -4,3 +4,4 @@ node_modules/
 /playwright/.cache/
 tests/excelDownloads
 *.xlsx
+.env

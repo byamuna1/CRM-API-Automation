@@ -1,3 +1,5 @@
+require('dotenv').config()
+export const stage = process.env.stage
 export const MAIN = {
     PROJECT : 'SPECTRA',
     SCR_EXCEL : 'SCR - ASBL Spectra as on 19-06-2023.xlsx',
@@ -6,21 +8,26 @@ export const MAIN = {
 
 export const SPRINGS = {
     PROJECT : 'SPRINGS',
-    SCR_EXCEL : 'SCR - ASBL Springs as on 01-09-2023.xlsx',
+    SCR_EXCEL : 'SCR - ASBL Springs as on 09-01-2024.xlsx',
     PROJECTID : '6348a680f18f5f2282196150',
 }
 
 export const SPECTRA = {
     PROJECT : 'SPECTRA',
-    SCR_EXCEL : 'SCR - ASBL Spectra as on 01-09-2023.xlsx',
+    SCR_EXCEL : 'SCR - ASBL Spectra as on 09-01-2024.xlsx',
     PROJECTID : '6348a680f18f5f2282196152',
 }
 
 export const SPIRE = {
     PROJECT : 'SPIRE',
-    SCR_EXCEL : 'SCR - ASBL Spire as on 01-09-2023.xlsx',
+    SCR_EXCEL : 'SCR - ASBL Spire as on 09-01-2024.xlsx',
     PROJECTID : '6348a680f18f5f228219614e',
 }
 
-export const Authorization = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzQ3ZDFlMWRhM2VjYWE1MDUxMjM2OWEiLCJjb250YWN0TnVtYmVyIjoiKzkxMTExMTExMTExMSIsImVtYWlsIjoiYWRtaW5AaW5uY2lyY2xlcy5jb20iLCJmaXJzdE5hbWUiOiJTeXN0ZW0iLCJpc0FjdGl2ZSI6dHJ1ZSwibGFzdE5hbWUiOiJBZG1pbiIsInByb2plY3RzIjpbIjYzNDhhNjgwZjE4ZjVmMjI4MjE5NjE0ZSIsIjYzNDhhNjgwZjE4ZjVmMjI4MjE5NjE1MCIsIjYzNDhhNjgwZjE4ZjVmMjI4MjE5NjE1MiIsIjY0YWU4NjkyZjE4ZjVmMjI4MjE4MzY4MyJdLCJ1c2VyVHlwZSI6IlNZU19BRE1JTiIsInVwZGF0ZWRBdCI6IjIwMjMtMDQtMTNUMTQ6NDI6MzguNjMwWiIsImlhdCI6MTY5MzU0MzY0MiwiZXhwIjoxNjk0MTQ4NDQyfQ.jBNhnDizy-q2IDGB7Nndw1oZXvdO0MBRcORCXH62-9I'
-export const currentUser = '6347d1e1da3ecaa50512369a'
+export const LOFT = {
+    PROJECTID : '64ae8692f18f5f2282183683',
+    PROJECT : 'LOFT'
+}
+
+export const Authorization = process.env.Authorization
+export const currentUser = process.env.currentUser
