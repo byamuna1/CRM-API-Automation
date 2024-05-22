@@ -128,7 +128,8 @@ test ("spectra costsheet Data" , async () => {
     }
 
     const res = await apiRequestFlatDetails();
-    for(let index=0; index< res.data.length ; index++)
+    console.log(res.data.length)
+    for(let index=0; index< res.data.flats.length ; index++)
     {
         let costsheet_types : any = {
             basicRate : null ,
@@ -165,8 +166,9 @@ test ("spectra costsheet Data" , async () => {
 
         //cost sheet Validation
         let totalsaleParticulars :number = 0;
-        let flatID : string = res.data[index][RESPONSE.ID] ;
+        let flatID : string = res.data.flats[index]['_id'] ;
         const result = await apiRequestFlatCostSheetDetails(flatID);
+        console.log(result)
         let flag = result.data.saleParticulars.otherParticulars ? 1 : 0;
         
         if(flag != 0)
