@@ -110,6 +110,7 @@ export const EXCELS = {
     SPIRE : 'SPIRE',
     SPRINGS : 'SPRINGS',
     SPECTRA : 'SPECTRA',
+    LOFT: 'LOFT',
     USERDETAILS_EXCEL : `excelDownloads/${newdate}/spectra-userdetails.xlsx`,
     SPIRE_MISMATCH : 'SPIRE-MISMATCHDATA',
     SPECTRA_MISMATCH : 'SPECTRA-MISMATCHDATA',
@@ -144,6 +145,7 @@ export const EXCELS = {
     SPRINGS_SALEPARTICULARS : `excelDownloads/${newdate}/springs-saleparticulars.xlsx`,
 
     COSTSHEET : `excelDownloads/${newdate}/CostSheet.xlsx`,
+    COSTSHEETValidation : `excelDownloads/${newdate}/CostSheetValidation.xlsx`,
     LOANDETAILS : `excelDownloads/${newdate}/LoanDetails.xlsx`,
     COLECTION_LOGS : `excelDownloads/${newdate}/CollectionLogs.xlsx`,
     SALE_PARTICULARS : `excelDownloads/${newdate}/SaleParticulars.xlsx`,

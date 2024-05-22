@@ -9,8 +9,9 @@ const headers = {
 }
 
 export const apiRequestFlatDetails = async () => {
-    
-    const url1 = `https://${stage}.crmadmin.inncircles.com/api/flat/list-view`
+    const limit = 'limit=10000';
+    const sortBy = 'skip=0';
+    const url1 = `https://${stage}.crmadmin.inncircles.com/api/flat/list-view?${sortBy}&${limit}`
     const response = await axios.get(url1,{ headers : headers})
     return response.data
 }
